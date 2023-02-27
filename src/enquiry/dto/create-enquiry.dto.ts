@@ -5,8 +5,9 @@ import {
     IsPhoneNumber,
     IsBoolean,
     } from 'class-validator';
-    
+    import { Expose } from 'class-transformer';
     export class CreateEnquiryDto {
+        
     @IsString()
     @IsNotEmpty()
     firstName: string;
@@ -49,4 +50,12 @@ import {
     @IsBoolean()
     @IsNotEmpty()
     checkboxWithTandC: boolean;
-    }
+    message: string[];
+    @Expose()
+    createdAt: Date;
+  
+    @Expose()
+    updatedAt: Date;
+    
+
+} 

@@ -27,7 +27,7 @@
 
 // }
 // }
-import { Injectable } from '@nestjs/common';
+import { Injectable,NotFoundException,ConflictException, } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Enquiry,EnquiryDocument } from './schemas/enquiry.schema';
@@ -35,10 +35,14 @@ import { CreateEnquiryDto } from './dto/create-enquiry.dto';
 
 @Injectable()
 export class EnquiryService {
+  private enquiries = [];
 constructor(
-@InjectModel(Enquiry.name) private readonly enquiryModel: Model<EnquiryDocument>,
+  
+@InjectModel(Enquiry.name) private readonly  enquiryModel: Model<EnquiryDocument>
 ) {}
-
+async findByEmailOrPhone(email: string, phone: string): Promise<Enquiry> {
+  return this.enquiryModel.findOne({ $or: [{ emailID: email }, { phoneNumber: phone }] }).exec();
+  }
 async getEnquiry(): Promise<Enquiry[]> {
             return await this.enquiryModel.find().exec();
         }
@@ -49,8 +53,20 @@ async create(createEnquiryDto: CreateEnquiryDto): Promise<Enquiry> {
 const enquiry = new this.enquiryModel(createEnquiryDto);
 return await enquiry.save();
 }
-async findAll(): Promise<Enquiry[]> {
-    return this.enquiryModel.find().exec();
-  }
 
+async findAll(): Promise<Enquiry[]> {
+  return this.enquiryModel.find().exec();
+}
+
+
+  async changeStatus(id: string, status: string): Promise<Enquiry> {
+    const enquiry = await this.enquiryModel
+      .findByIdAndUpdate(
+        id,
+        { $set: { status } },
+        { new: true },
+      )
+      .exec();
+    return enquiry;
+  }
 }

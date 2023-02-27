@@ -20,7 +20,7 @@
 
    
 // }
-import { Controller, Post,Get, Body,Param } from '@nestjs/common';
+import { Controller, Post,Get, Body,Param,InternalServerErrorException } from '@nestjs/common';
 import { EnquiryService } from './enquiry.service';
 import { CreateEnquiryDto } from './dto/create-enquiry.dto';
 import { Enquiry } from './schemas/enquiry.schema';
@@ -31,8 +31,20 @@ constructor(private readonly enquiryService: EnquiryService) {}
 
 @Post('submit')
 async create(@Body() createEnquiryDto: CreateEnquiryDto) {
-return await this.enquiryService.create(createEnquiryDto);
-}
+    const { emailID, phoneNumber } = createEnquiryDto;
+    const existingEnquiry = await this.enquiryService.findByEmailOrPhone(emailID, phoneNumber);
+    
+    if (existingEnquiry) {
+    return { message: "Enquiry already exists with this email or phone number" };
+    }
+    
+    try {
+    const result = await this.enquiryService.create(createEnquiryDto);
+    return { message: "Enquiry Successfully Submitted", payload: result };
+    } catch (error) {
+    throw new InternalServerErrorException(error.message);
+    }
+    }
 @Get('detail/:enquiry_id')
 async getEnquiryId(@Param('enquiry_id') id: string): Promise<Enquiry>  {
     return this.enquiryService.getEnquiryId(id);
@@ -46,4 +58,11 @@ return await this.enquiryService.getEnquiry();
 async findall() {
 return await this.enquiryService.findAll();
 }
+@Post(':id/change_status')
+  async changeStatus(
+    @Param('id') id: string,
+    @Body('status') status: string,
+  ): Promise<Enquiry> {
+    return this.enquiryService.changeStatus(id, status);
+  }
 }
