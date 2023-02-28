@@ -1,25 +1,4 @@
-// import { Controller } from '@nestjs/common';
-// import {  Get, Post, Body, Param, Put, Delete,UsePipes, ValidationPipe } from '@nestjs/common';
-// import { EnquiryService } from './enquiry.service';
-// import { Enquiry } from './models/enquiry.entity';
 
-// @Controller('enquiry')
-// export class EnquiryController {
-//     constructor(private readonly EnquiryService: EnquiryService) {}
-
-//     @Post()
-//     @UsePipes(new ValidationPipe({ transform: true }))
-//     async createEnquiry(@Body() payload:data): Promise<Enquiry> {
-//         return await this.EnquiryService.createEnquiry(data);
-//     }
-    
-//     @Get()
-//     async getEnquiry(): Promise<Enquiry[]>  {
-//         return this.EnquiryService.getEnquiry();
-//     }
-
-   
-// }
 import { Controller, Post,Get, Body,Param } from '@nestjs/common';
 import { EnquiryService } from './enquiry.service';
 import { CreateEnquiryDto } from './dto/create-enquiry.dto';
